@@ -1,0 +1,144 @@
+<section class="leave-request">
+    <h2>Request Leave</h2>
+    <form id="leaveRequestForm">
+        <label for="leaveType">Leave Type:</label>
+        <select id="leaveType">
+            <option value="">Select Leave Type</option>
+            <option value="Annual Leave">Annual Leave</option>
+            <option value="Sick Leave">Sick Leave</option>
+            <option value="Casual Leave">Casual Leave</option>
+        </select>
+        <span class="error-message" id="leaveTypeError"></span>
+
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" min="">
+        <span class="error-message" id="startDateError"></span>
+
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" min="">
+        <span class="error-message" id="endDateError"></span>
+
+        <label for="reason">Reason:</label>
+        <textarea id="reason" rows="3"></textarea>
+        <span class="error-message" id="reasonError"></span>
+
+        <button type="submit" class="submit-btn">Submit Request</button>
+    </form>
+</section>
+
+<style>
+    .error-message {
+        color: red;
+        font-size: 12px;
+        display: none;
+        margin-top: 5px;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    input:invalid, select:invalid, textarea:invalid {
+        border: 2px solid red;
+    }
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const leaveType = document.getElementById("leaveType");
+        const startDate = document.getElementById("startDate");
+        const endDate = document.getElementById("endDate");
+        const reason = document.getElementById("reason");
+        const today = new Date().toISOString().split("T")[0];
+    
+        // Set min value to prevent selecting past dates
+        startDate.min = today;
+        endDate.min = today;
+    
+        // Function to show error message
+        function showError(element, message) {
+            const errorSpan = document.getElementById(element.id + "Error");
+            errorSpan.textContent = message;
+            errorSpan.style.display = "block";
+            errorSpan.style.opacity = "1";
+            element.style.border = "2px solid red";
+        }
+    
+        // Function to clear error
+        function clearError(element) {
+            const errorSpan = document.getElementById(element.id + "Error");
+            errorSpan.textContent = "";
+            errorSpan.style.display = "none";
+            errorSpan.style.opacity = "0";
+            element.style.border = "";
+        }
+    
+        // Live validation
+        leaveType.addEventListener("change", () => {
+            if (leaveType.value === "") {
+                showError(leaveType, "Please select a leave type.");
+            } else {
+                clearError(leaveType);
+            }
+        });
+    
+        startDate.addEventListener("input", () => {
+            endDate.min = startDate.value; // Ensure end date can't be before start date
+            if (!startDate.value) {
+                showError(startDate, "Start Date is required.");
+            } else {
+                clearError(startDate);
+            }
+        });
+    
+        endDate.addEventListener("input", () => {
+            if (!endDate.value) {
+                showError(endDate, "End Date is required.");
+            } else if (endDate.value < startDate.value) {
+                showError(endDate, "End Date cannot be before Start Date.");
+            } else {
+                clearError(endDate);
+            }
+        });
+    
+        reason.addEventListener("input", () => {
+            if (!reason.value.trim()) {
+                showError(reason, "Please provide a reason for leave.");
+            } else {
+                clearError(reason);
+            }
+        });
+    
+        // Form submission validation
+        document.getElementById("leaveRequestForm").addEventListener("submit", function (event) {
+            let isValid = true;
+    
+            if (leaveType.value === "") {
+                showError(leaveType, "Please select a leave type.");
+                isValid = false;
+            }
+    
+            if (!startDate.value) {
+                showError(startDate, "Start Date is required.");
+                isValid = false;
+            }
+    
+            if (!endDate.value) {
+                showError(endDate, "End Date is required.");
+                isValid = false;
+            } else if (endDate.value < startDate.value) {
+                showError(endDate, "End Date cannot be before Start Date.");
+                isValid = false;
+            }
+    
+            if (!reason.value.trim()) {
+                showError(reason, "Please provide a reason for leave.");
+                isValid = false;
+            }
+    
+            if (!isValid) {
+                event.preventDefault(); // Prevent form submission if validation fails
+            } else {
+                alert("Leave Request Form submitted successfully!");
+            }
+        });
+    });
+    </script>
+    
